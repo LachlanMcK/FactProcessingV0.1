@@ -1,0 +1,184 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>Test - Payroll Event (Child)</title>
+
+    <script src="../scripts/es5-shim.min.js"></script>
+    <script src="../scripts/require.min.js" data-main="sample-main"></script>
+    <style>
+.validationMessage { color: #f00; }
+section { margin: 1em; border: 1px solid black; }
+section section { border: none; }
+section + section { border-top: 1px solid black; }
+section > div { overflow-y: scroll; max-height: 30em; border: 1px solid black; margin: 1em 0; }
+section > div > div * { margin-bottom: 0; }
+section > div > div { padding: 0 0.5em 1em; height: 100%; }
+section > div > div + div { border-top: 1px solid black; }
+section > div > div:nth-child(even) { background-color: #eee; }
+section fieldset { display: inline-block; }
+/*
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:700,400);
+body { padding: 10px 0; font-family: 'Open Sans', sans-serif; font-weight: 400; font-size: 14px; }
+fieldset { padding: 10px; }
+strong { font-weight: 700; }
+label { display: inline-block; width: 120px; }
+button { padding: 3px 6px; }
+input, select { width: 180px; padding: 3px 6px; border-radius: 3px; border: 1px solid #ccc; outline: none; margin-right: 5px; transition: .3s all ease-in-out; }
+select { width: 194px; }
+input:focus { border: 1px solid #5579A9; box-shadow: 0px 0px 4px 0px #6FA5ED; }
+.row { margin-bottom: 5px; }
+.well { border:1px solid #ccc; border-radius: 3px; background-color:#efefef; box-sizing:border-box; width:100%; padding:10px; }
+*/
+    </style>
+  </head>
+  <body>
+
+<ul data-bind="foreach: errors" class="validationMessage">
+  <li data-bind="text: $data, click: function () { vm.oErrors[$index()].focus(); }"></li>
+</ul>
+
+<h1>Test - Payroll Event (Child)</h1>
+
+<section>
+  <section>
+    <h2>Payer Details</h2>
+    <p><label>Payer external identifier: <input data-bind="value: oTH_PAYER_DTLS_ClientExternalID" maxlength="12" /></label></p>
+    <p><label>Payer external identifier type code: <input data-bind="value: oTH_PAYER_DTLS_ClientExternalIdentifierTypeCode" type="number" maxlength="3" /></label></p>
+    <p><label>Payer name: <input data-bind="value: oTH_PAYER_DTLS_UnstructuredFullName" maxlength="200" /></label></p>
+    <p><label>Derived payer ABN/WPN: <input data-bind="value: oTH_PAYER_DTLS_DerivedClientIdentifierAustralianBusinessNumber" maxlength="12" /></label></p>
+    <p><label>Derived payer name: <input data-bind="value: oTH_PAYER_DTLS_DerivedUnstructuredFullName" maxlength="200" /></label></p>
+    <p><label>BMS ID: <input data-bind="value: oTH_PAYER_DTLS_BusinessMangamentSoftwareIdentifier" maxlength="200" /></label></p>
+    <p><label>Payer branch code: <input data-bind="value: oTH_PAYER_DTLS_EmployerBranchCode" type="number" min="-9999999" max="9999999" /></label></p>
+    <p><label>Derived branch code: <input data-bind="value: oTH_PAYER_DTLS_DerivedClientBranchNumber" type="number" min="-9999999" max="9999999" /></label></p>
+  </section>
+
+  <section>
+    <h2>Payee Details</h2>
+    <p><label>Payee Payroll ID: <input data-bind="value: oTH_PAYEE_DTLS_CurrentPayerPayeeRelationshipPayeePayrollIdentifier" maxlength="200" /></label></p>
+    <p><label>Employment commencement date: <input data-bind="value: oTH_PAYEE_DTLS_PayerPayeeRelationshipCommencementDate" type="date" /></label></p>
+    <p><label>Employment cessation date: <input data-bind="value: oTH_PAYEE_DTLS_PayerPayeeRelationshipCessationDate" type="date" /></label></p>
+    <p><label>Payee TFN: <input data-bind="value: oTH_PAYEE_DTLS_ClientIdentifierTaxFileNumber" maxlength="12" /></label></p>
+    <p><label>Contractor ABN: <input data-bind="value: oTH_PAYEE_DTLS_ContractorClientIdentifierAustralianBusinessNumber" maxlength="12" /></label></p>
+    <p><label>Family name: <input data-bind="value: oTH_PAYEE_DTLS_StructuredFamilyName" inputmode="latin-name" maxlength="40" /></label></p>
+    <p><label>Given name: <input data-bind="value: oTH_PAYEE_DTLS_StructuredGivenName" inputmode="latin-name" maxlength="40" /></label></p>
+    <p><label>Other given name: <input data-bind="value: oTH_PAYEE_DTLS_StructuredOtherGivenName" inputmode="latin-name" maxlength="40" /></label></p>
+    <p><label>Date of birth: <input data-bind="value: oTH_PAYEE_DTLS_IndividualBirthDate" type="date" /></label></p>
+    <p><label>Address line 1: <input data-bind="value: oTH_PAYEE_DTLS_UnstructuredGeographicAddressLine1" maxlength="38" /></label></p>
+    <p><label>Address line 2: <input data-bind="value: oTH_PAYEE_DTLS_UnstructuredGeographicAddressLine2" maxlength="38" /></label></p>
+    <p><label>Suburb/town/locality: <input data-bind="value: oTH_PAYEE_DTLS_StructuredGeographicAddressLocalityName" maxlength="46" /></label></p>
+    <p><label>State/territory: <input data-bind="value: oTH_PAYEE_DTLS_StructuredGeographicAddressStateCode" maxlength="3" /></label></p>
+    <p><label>Postcode: <input data-bind="value: oTH_PAYEE_DTLS_StructuredGeographicAddressPostcode" maxlength="12" /></label></p>
+    <p><label>Country code: <select data-bind="options: refDataService.getGeneric('GRP-COUNTRY-CODES').rows, optionsValue: '3', optionsText: '6', value: oTH_PAYEE_DTLS_CountryCode, optionsCaption: 'Choose...'"></select></label></p>
+    <p><label>Payee e-mail address: <input data-bind="value: oTH_PAYEE_DTLS_PayeeInternetEmailAddress" maxlength="200" /></label></p>
+    <p><label>Payee phone number: <input data-bind="value: oTH_PAYEE_DTLS_PayeeTelephoneNumber" maxlength="16" /></label></p>
+  </section>
+</section>
+
+<section>
+  <section>
+    <h2>Payroll Event</h2>
+    <p><label>Payroll event period start date: <input data-bind="value: oTH_PAYROLL_EVNT_PayrollEventPeriodStartDate" type="date" /></label></p>
+    <p><label>Payroll event period end date: <input data-bind="value: oTH_PAYROLL_EVNT_PayrollEventPeriodEndDate" type="date" /></label></p>
+    <p><label>Payroll event financial year: <input data-bind="value: oTH_PAYROLL_EVNT_FinancialYear" type="number" min="0" max="9999" /></label></p>
+    <p><label>Lodgment date: <input data-bind="value: oTH_PAYROLL_EVNT_LodgmentDate" type="date" /></label></p>
+    <p><label>Payment record effective date: <input data-bind="value: oTH_PAYROLL_EVNT_PaymentDate" type="date" /></label></p>
+    <p><label>Payroll run timestamp: <input data-bind="value: oTH_PAYROLL_EVNT_PayrollMessageTimestampSourceDatetime" maxlength="26" /></label></p>
+    <p><label>Final event indicator: <input type="checkbox" data-bind="checked: oTH_PAYROLL_EVNT_PayrollEventFinalIndicator.asBool" /></label></p>
+  </section>
+</section>
+
+<section>
+  <section>
+    <h2>Wage And Taxation Item</h2>
+    <p><label>Payee exempt foreign employment amount - YTD: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_PayeeForeignIncomeExemptAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+    <p><label>Payee community development employment project (CDEP) payment - YTD: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_PayeeIncomeCommunityDevelopmentEmploymentProjectAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+    <div data-bind="foreach: oTH_WAGE_AND_TAX_ITEM_SectionGroup5s">
+      <div>
+        <p><label>Employment termination payment type: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_EmploymentTerminationPaymentTypeCode" type="number" maxlength="3" /></label></p>
+        <p><label>Payee ETP payment date: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_EmploymentTerminationPaymentPaymentDate" type="date" /></label></p>
+        <p><label>Payee total ETP PAYGW amount: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_EmploymentTerminationPaymentTaxWithheldTotalAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+        <p><label>Payee ETP tax free component: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_EmploymentTerminationPaymentTaxFreeAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+        <p><label>Payee ETP taxable component: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_EmploymentTerminationPaymentTaxableComponentAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+      </div>
+    </div>
+    <p><label>Payee lump sum payment A type: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_PayeeAnnualLongServiceLeaveUnusedLumpSumACode" type="number" maxlength="3" /></label></p>
+    <p><label>Payee lump sum payment A - YTD: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_PayeeAnnualLongServiceLeaveUnusedLumpSumAAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+    <p><label>Payee lump sum payment B - YTD: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_PayeeAnnualLongServiceLeaveUnusedLumpSumBAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+    <p><label>Payee lump sum payment D - YTD: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_PayeeAnnualLongServiceLeaveUnusedLumpSumDAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+    <p><label>Payee lump sum payment E - YTD: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_PayeeAnnualLongServiceLeaveUnusedLumpSumEAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+    <p><label>Payee gross payments individual - YTD: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_PayeeYearToDateIncomeGrossAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+    <p><label>Payee gross payments foreign employment - YTD: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_PayeeForeignIncomeEmploymentGrossAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+    <p><label>Payee gross payments JPDA foreign employment - YTD: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_PayeeForeignIncomeEmploymentJointPetroleumDevelopmentAreaGrossAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+    <p><label>Payee labour hire gross payment - YTD: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_PayeeIncomeLabourHireArrangementGrossAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+    <p><label>Payee voluntary agreement gross amount - YTD: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_PayeeIncomeVoluntaryAgreementGrossAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+    <p><label>Payee gross payments other specified payments - YTD: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_PayeeIncomeOtherAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+    <p><label>Payee gross payments working holiday maker - YTD: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_PayeeIncomeWorkingHolidayMakerYearToDateGrossAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+    <p><label>Payee reportable fringe benefits taxable amount - YTD: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_PayeeFringeBenefitsReportableTaxableAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+    <p><label>Payee reportable fringe benefits exempt amount - YTD: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_PayeeFringeBenefitsReportableExemptAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+    <p><label>Payee total INB PAYGW amount - YTD: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_PayAsYouGoWithholdingYearToDateWithheldAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+    <p><label>Payee total FEI PAYGW amount - YTD: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_PayAsYouGoWithholdingForeignEmploymentIncomeTotalAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+    <p><label>Payee total FEI JPDA PAYGW amount - YTD: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_PayAsYouGoWithholdingForeignEmploymentIncomeJointPetroleumDevelopmentAreaTotalAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+    <p><label>Payee total labour hire PAYGW amount - YTD: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_PayAsYouGoWithholdingLabourHireTotalAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+    <p><label>Payee total voluntary agreement PAYGW amount - YTD: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_PayAsYouGoWithholdingVoluntaryAgreementTotalAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+    <p><label>Payee total other specified payments PAYGW amount - YTD: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_PayAsYouGoWithholdingOtherSpecifiedTotalAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+    <p><label>Payee total working holiday maker PAYGW amount - YTD: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_PayAsYouGoWithholdingWorkingHolidayMakerYearToDateTotalAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+    <p><label>Foreign employment income foreign tax paid - YTD: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_YearToDateForeignIncomeEmploymentTaxCreditWithheldAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+    <p><label>JPDA Foreign employment income foreign tax paid - YTD: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_JointPetroleumDevelopmentAreaForeignIncomeEmploymentTaxPaidYearToDateAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+    <p><label>Total Gross Payments: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_PaymentSummaryTotalGrossPaymentAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+    <p><label>Total PAYGW Amount: <input data-bind="value: oTH_WAGE_AND_TAX_ITEM_TaxWithheldTotalAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+  </section>
+</section>
+
+<section>
+  <section>
+    <h2>Deduction Item</h2>
+    <div data-bind="foreach: oTH_DEDUCTION_ITEM_SectionGroup3s">
+      <div>
+        <p><label>Deduction type: <input data-bind="value: oTH_DEDUCTION_ITEM_IndividualDeductionTypeCode" type="number" maxlength="3" /></label></p>
+        <p><label>Payee deduction amount - YTD: <input data-bind="value: oTH_DEDUCTION_ITEM_IndividualDeductionYearToDateAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+      </div>
+    </div>
+  </section>
+</section>
+
+<section>
+  <section>
+    <h2>Allowance Item</h2>
+    <div data-bind="foreach: oTH_ALLOWANCE_ITEM_SectionGroup4s">
+      <div>
+        <p><label>Allowance type: <input data-bind="value: oTH_ALLOWANCE_ITEM_AllowanceIncomeTypeCode" type="number" maxlength="3" /></label></p>
+        <p><label>Other allowance type: <input data-bind="value: oTH_ALLOWANCE_ITEM_AllowanceIncomeTypeOtherDescriptionText" maxlength="40" /></label></p>
+        <p><label>Payee allowance amount - YTD: <input data-bind="value: oTH_ALLOWANCE_ITEM_AllowanceIncomeYearToDateAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+      </div>
+    </div>
+    <p><label>Payee total YTD allowance amount: <input data-bind="value: oTH_ALLOWANCE_ITEM_AllowanceIncomeTotalAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+  </section>
+</section>
+
+<section>
+  <section>
+    <h2>Super Entitlement</h2>
+    <p><label>Payer contributions superannuation guarantee amount - YTD: <input data-bind="value: oTH_SUPER_ENTITLEMENT_YearToDateSuperannuationGuaranteeEmployerContributionAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+    <p><label>Payee ordinary time earnings (OTE) - YTD: <input data-bind="value: oTH_SUPER_ENTITLEMENT_YearToDateSuperannuationGuaranteeOrdinaryTimeEarningsAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+    <p><label>Reportable employer super contribution - YTD: <input data-bind="value: oTH_SUPER_ENTITLEMENT_EmployerSuperannuationContributionReportableAmount" type="number" min="-99999999999.99" max="99999999999.99" step="0.01" /></label></p>
+  </section>
+</section>
+
+<section>
+  <section>
+    <h2>TFN Declaration</h2>
+    <p><label>Payee employment type code: <input data-bind="value: oTH_TFN_DECLARATION_PayerPayeeRelationshipPaymentBasisCode" type="number" maxlength="3" /></label></p>
+    <p><label>Payee residency status: <input data-bind="value: oTH_TFN_DECLARATION_PayeeClientResidentStatusCode" type="number" maxlength="3" /></label></p>
+    <p><label>Payee tax free threshold claimed: <input type="checkbox" data-bind="checked: oTH_TFN_DECLARATION_PayerPayeeRelationshipTaxFreeThresholdClaimedIndicator.asBool" /></label></p>
+    <p><label>Payee Study and Training Loan Repayment Claimed: <input type="checkbox" data-bind="checked: oTH_TFN_DECLARATION_PayerPayeeRelationshipStudyandTrainingLoanRepaymentClaimedIndicator.asBool" /></label></p>
+    <p><label>Payee Student Financial Supplement Scheme Claimed: <input type="checkbox" data-bind="checked: oTH_TFN_DECLARATION_PayerPayeeRelationshipStudentFinancialSupplementDebtClaimedIndicator.asBool" /></label></p>
+    <p><label>Payee declaration acceptance indicator: <input type="checkbox" data-bind="checked: oTH_TFN_DECLARATION_PayeeDeclarationIndicator.asBool" /></label></p>
+    <p><label>Payee declaration date: <input data-bind="value: oTH_TFN_DECLARATION_PayeeDeclarationDate" type="date" /></label></p>
+    <p><label>Payee terminated indicator: <input type="checkbox" data-bind="checked: oTH_TFN_DECLARATION_PayerPayeeRelationshipTerminatedIndicator.asBool" /></label></p>
+  </section>
+</section>
+
+  </body>
+</html>

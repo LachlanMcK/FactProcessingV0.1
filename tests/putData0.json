@@ -1,0 +1,38 @@
+{
+    "ClientInternalId" : 12345,
+    "AccountSequenceNumber" : 1,
+    "RoleTypeCode" : 5,
+    "PeriodStartDt" : "2019-01-01",
+    "FormType" : "myFT6",
+    "TransactionId" : "11223344",
+    "someCrapola" : "just something different",
+    "Sections": [
+        {
+            "SectionId": "1",
+            "SectionName": "Fred",
+            "LineItems": [{
+                "FieldId": "1",
+                "FieldIndex": 0,
+                "Value": "1111's"
+                },{
+                "FieldId": "2",
+                "FieldIndex": 0,
+                "Value": "222's"
+              }
+            ]       
+        },         {
+            "SectionId": "2",
+            "SectionName": "Mary",
+            "LineItems": [{
+                "FieldId": "1",
+                "FieldIndex": 0,
+                "Value": "more 1111's"
+                },{
+                "FieldId": "3",
+                "FieldIndex": 0,
+                "Value": "333's"
+              }
+            ]       
+        }
+    ]
+}
