@@ -102,6 +102,7 @@ describe("PUT tests ", () => { //return;//
     const longURI =  "/api/v1/Clients/ABN/1234567890/Accounts/1/Roles/IT/Forms/myFT6Form/5432101";
     const secretURI = "/api/v1/Clients/ABN/1234567890/Forms/myFT6Form/_id/"; //e.g 5c410abc35f35809ad24ba1b"
     let mongoId ="";
+    let createdAt = new Date();
 
     test("Put 1 - Delete form " + shortURI + " result not checked as just cleanup" , ()=> {
 
@@ -155,7 +156,11 @@ describe("PUT tests ", () => { //return;//
             postData.FormType = "myFT6";
             
             expect(response.body).sameForm(postData, ignoreList);
+            
+            // sorry, this is dodgy, but the next couple of tests is to do an update, so it needs these values
             mongoId = response.body._id;
+            createdAt = response.body.createdAt;
+            
         });
         
     });
@@ -163,15 +168,21 @@ describe("PUT tests ", () => { //return;//
     test("Put 5 - Updating existing Form with PUT " + longURI + " should return 200", ()=> {
 
         let postData = th.standardForm({TransactionId:5432101});
+        // this test will fail if createdAt is not set by previous test 
+        // therefore to run this test, also run previous test, i.e. npm run test -- -t "Put (4|5|6)"
+        let t = new Date(createdAt);
+        postData.createdAt = createdAt;
+        postData.DT_Update = t.toLocaleDateString();
+        postData.TM_Update = t.toLocaleTimeString();
         
         return request(app).put(longURI)
         .set('Accept', 'application/json')
         .send(postData)
         .then(response => {
             
-            if (response.body.createdAt == response.body.updatedAt) 
-                expect(response.statusCode).toEqual(201);
-            else
+            // if (response.body.createdAt == response.body.updatedAt) 
+            //     expect(response.statusCode).toEqual(201);
+            // else
                 expect(response.statusCode).toEqual(200);
             
             const lessThanOneMinuteAgo = (new Date() - new Date(response.body.updatedAt)) < 60000;
@@ -195,6 +206,8 @@ describe("PUT tests ", () => { //return;//
         let postData = th.standardForm({});
         delete postData.TransactionId;
         
+        // this test will fail if the id is not set by the previous add test 
+        // therefore to run this test, also run previous test, i.e. npm run test -- -t "Put (4|5|6)"
         return request(app).put(secretURI + mongoId)
         .set('Accept', 'application/json')
         .send(postData)
@@ -245,7 +258,9 @@ describe("PUT tests ", () => { //return;//
 const stpTests = describe("STP tests", () => {
 
   const longURI =  "/api/v1/Clients/ABN/1234567890/Accounts/1/Roles/IT/Forms/10131Form/111222333";
-  const ignoreList = ["_id", "__v", "createdAt", "updatedAt", "DT_Update", "TM_Update", "Sections"];
+  const ignoreList = ["_id", "__v", "createdAt", "updatedAt", "DT_Update", "TM_Update", "Sections", "field", "modified"];
+  let stp = require('../jsre/forms/oTH_PAYROLL_EVENT_CHILDValidate');
+  
   function jsreDummyform() {
     let f = require("../jsre/forms/oTH_PAYROLL_EVENT_CHILDForm.js");
     expect(f.id).toBe(10131);
@@ -268,7 +283,7 @@ const stpTests = describe("STP tests", () => {
     function ViewModel() {}
     let vm = new ViewModel();
     
-    var th = require('./testingHelpers')
+    let th = require('./testingHelpers')
     vm = th.standardHeader({});
     vm = th.standardPayrollEventChild(vm,{});  //I didn't notice the provided sample form until after I did this.
     
@@ -282,19 +297,66 @@ const stpTests = describe("STP tests", () => {
 
     //LM crashing in FdfValueOf - although current date is recorded as a string, it is trying to get it as a numeric - line 52
     //LM ...looking at constructor, if string this._numericValue = null; but here in FdfValueOf if numericValue is null it still calls getNumeric???
-    FdfValue = require("../jsre/fdfValue");
-    FdfValue.prototype.oldValueOfFunc = FdfValue.prototype.valueOf;
-    FdfValue.prototype.valueOf = function () {
-            return (this.type == "ALPHA") ? this._value: this.oldValueOfFunc();
-        };
-    
+    let FdfValue = require("../jsre/fdfValue");
+    if (!FdfValue.prototype.oldValueOfFunc) {
+      FdfValue.prototype.oldValueOfFunc = FdfValue.prototype.valueOf;
+      FdfValue.prototype.valueOf = function () {
+              return (this.type == "ALPHA") ? this._value: this.oldValueOfFunc();
+          };
+    }
     expect(FdfValue.name).toBe("FdfValue");
 
     return vm;
   }
+  
+  function fudgeExpected(postData) {
+    postData.TransactionId = 111222333;
+    postData.ClientInternalId = 12345;
+    delete postData.ClientIdentifierType;
+    delete postData.ClientIdentifierValue;
+    postData.AccountSequenceNumber = 1;
+    postData.RoleTypeCode = 5;
+    postData.FormType = "10131";
+    
+    return postData;
+  }
+    
+  function fudgeResponse(responseBody) { 
+    delete responseBody['10955'];
+    delete responseBody['10956'];
+    delete responseBody['10958'];
+    delete responseBody['11120'];
+    delete responseBody['11121'];
+    delete responseBody['11122'];
+    delete responseBody['11123'];
+    delete responseBody['11124'];
+    delete responseBody['11125'];
+    delete responseBody['11126'];
+    delete responseBody['11127'];
+    delete responseBody['11128'];
+    delete responseBody['11306'];
+    delete responseBody['11629']; 
+    delete responseBody['11630']; 
+    delete responseBody['11940'];
+    delete responseBody['11941'];
+    delete responseBody['12916'];
+    delete responseBody['60088'];
+    
+    return responseBody;
+  };
   // just test if can load form & rules engine
   test("STP 1 - STP Form loads", () => { //return;//
-    var stp = require('../jsre/forms/oTH_PAYROLL_EVENT_CHILDValidate');
+    const vm = jsreDummyform();
+    expect(vm.formYear).toBe("2019");
+    expect(vm.oTH_WAGE_AND_TAX_ITEM_PaymentSummaryTotalGrossPaymentAmount()).toBe(30000.3);
+    const result = stp(vm);
+    const didItWork = result.errors.length == 0;
+    expect(didItWork).toBe(true);
+    expect(result.formLineItems[10936][26716]._value).toBe("30000.3");
+    //todo: add other expect statments around stored line items, but that'd mean I'd have to understand the business rules.
+  });
+    // just test if can load form & rules engine
+  test("STP 1a - Check can invoke rules engine twice", () => { //return;//
     const vm = jsreDummyform();
     expect(vm.formYear).toBe("2019");
     expect(vm.oTH_WAGE_AND_TAX_ITEM_PaymentSummaryTotalGrossPaymentAmount()).toBe(30000.3);
@@ -305,9 +367,24 @@ const stpTests = describe("STP tests", () => {
     //todo: add other expect statments around stored line items, but that'd mean I'd have to understand the business rules.
   });
   
-  test("STP 2 - Adding a new FORM with PUT " + longURI + " should return 201", ()=> {
+  test("STP 2 - List " + longURI + "Should return 200 OK", () => {
+    return request(app).get(longURI)
+    .then(response => {
+      expect(response.statusCode).toBe(200);
+      expect(response.body[0].ClientInternalId).toEqual(12345);
+      expect(response.body.length).toBeGreaterThan(0);
+      //verify all item returned have a ClientInternalId property with value 12345
+      expect(response.body.reduce( (total,item) => total += (item.ClientInternalId == 12345 ) ? 1:0 , 0 ) ).toEqual(response.body.length);
+      //expect(response.body[0]).sameForm({}, ignoreList);
+      //expect(response.body).toMatchObject([{"rubbish":"yep"}]);
+      expect(response.body[0][10936][26716]._value).toBe("30000.3");
+    })
+  });
+  
+  test("STP 3 - Adding a new FORM with PUT " + longURI + " should return 201", ()=> {
 
-    var stp = require('../jsre/forms/oTH_PAYROLL_EVENT_CHILDValidate');
+    expect.assertions(14);
+    
     const vm = jsreDummyform();
     expect(vm.formYear).toBe("2019");
     const x =  vm.oTH_WAGE_AND_TAX_ITEM_PaymentSummaryTotalGrossPaymentAmount();
@@ -315,9 +392,6 @@ const stpTests = describe("STP tests", () => {
 
     let postData = {};
     stp.mapVMToLI(vm, postData);
-    console.log("***************************************************");
-    console.log(JSON.stringify(postData));
-    console.log("***************************************************");
     expect(postData[10936][26716]._value).toBe("30000.3");
     
     return request(app).put(longURI)
@@ -325,7 +399,7 @@ const stpTests = describe("STP tests", () => {
     .send(postData)
     .then(response => {
       
-        expect(response.body).toEqual("rubbish");
+        //expect(response).toEqual({"rubbish":"Crap"});
         if (response.body.createdAt == response.body.updatedAt) 
           expect(response.statusCode).toEqual(201);
         else
@@ -334,15 +408,25 @@ const stpTests = describe("STP tests", () => {
         const lessThanOneMinuteAgo = (new Date() - new Date(response.body.updatedAt)) < 60000;
         expect(lessThanOneMinuteAgo).toEqual(true);
 
-        postData.TransactionId = 5432101;
-        postData.ClientInternalId = 12345;
-        delete postData.ClientIdentifierType;
-        delete postData.ClientIdentifierValue;
-        postData.RoleTypeCode = 5;
-        postData.FormType = "10131";
+        //expect(response.body).toMatchObject(postData);  //this doesn't work because jsre changes the form
         
-        expect(response.body).sameForm(postData, ignoreList);
+        const expected = fudgeExpected(postData);
+        const actual = fudgeResponse(response.body);
+        
+        expect(actual).sameForm(expected, ignoreList);
         mongoId = response.body._id;
     });
   });
+  
+  test("STP 4 - List " + longURI + "Should return 200 OK", () => {
+    return request(app).get(longURI)
+    .then(response => {
+      expect(response.statusCode).toBe(200);
+      expect(response.body[0].ClientInternalId).toEqual(12345);
+      expect(response.body.length).toBeGreaterThan(0);
+      //verify all item returned have a ClientInternalId property with value 12345
+      expect(response.body.reduce( (total,item) => total += (item.ClientInternalId == 12345 ) ? 1:0 , 0 ) ).toEqual(response.body.length);
+    })
+  });
+  
 });

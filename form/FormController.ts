@@ -57,6 +57,28 @@ FormRoutes.formRoutes.forEach((r) => {
  // anyway, not available yet - code below not tested
  // router.post('/:ClientIdentifierType/:ClientIdentifierValue/Forms/:FormTypeMung', createForm);
 
+// the current "public" format of a form has each section as a property of the form.
+// I couldn't figure out hot to "type" that in mongoose.  So instead forms are stored with 
+// an array of Sections.  This function converts the stored format of a form back to the public format.
+function transformStorageFormatToPublicFormat(form:any) {
+
+    for (let i = 0; i < form.Sections.length; i++){
+        let thisSecId = form.Sections[i].SectionId;
+        form[thisSecId] = {};
+        
+        for (let j = 0; j < form.Sections[i].LineItems.length; j++) {
+            let thisFieldId = form.Sections[i].LineItems[j].FieldId;
+            form[thisSecId][thisFieldId] = {
+                index : form.Sections[i].LineItems[j].FieldIndex,
+                _value : form.Sections[i].LineItems[j].Value
+            }
+        }
+    }
+    delete form.Sections;
+
+    return form;
+}
+
 // *****************************************************************************
 // Get Methods
 // *****************************************************************************
@@ -75,15 +97,19 @@ function getAllFormsTestingUseOnly (req: any, res: any) {
 export function getForms(req: express.Request, res: express.Response, next: express.NextFunction) {
     const lookup: formQueryType = turnURLStemsIntoLookupObject(req, next);
 
-    Form.find(lookup, function (err: any, form: any) {
+    Form.find(lookup, function (err: any, forms: any) {
         if (err) return res.status(500).send("There was a problem finding the form." + err);
-        if (!form) return res.status(404).send("No form found.!!");
+        if (!forms) return res.status(404).send("No form found.!!");
 
-            //todo: restify the response
-            //todo: decrypt line items
+        //todo: restify the response
+        //todo: decrypt line items
 
-        if ((form|| []).length == 0 ) return res.status(404).send("No form found.");
-        else res.status(200).send(form);  
+        if ((forms|| []).length == 0 ) return res.status(404).send("No form found.");
+
+        let result: any = [];
+        forms.forEach( (f:any)=> result.push(transformStorageFormatToPublicFormat(f._doc)));
+        
+        res.status(200).send(result);  
     }); 
 };
 
@@ -195,7 +221,7 @@ export function putApplyUpdateRules(req: express.Request, res: express.Response,
     
     if (req.body.FormType  == 10131) {
         //todo: update mongo to record in status field that update rules now applied
-        res.locals.data._do.ProcessingStatusCd = 2;
+        res.locals.stpForm.ProcessingStatusCd = 2;
     }
     
     //todo: restify the response
@@ -203,23 +229,7 @@ export function putApplyUpdateRules(req: express.Request, res: express.Response,
 
     let form = res.locals.data._doc;
     if (req.body.FormType  == 10131) {
-        
-        // put known secions/fields into sections & LineItem arrays so can use defined schema in mongoose.
-        
-        for (let i = 0; i < form.Sections.length; i++){
-            let thisSecId = form.Sections[i].SectionId;
-            form[thisSecId] = {};
-            
-            for (let j = 0; j < form.Sections[i].LineItems.length; j++) {
-                let thisFieldId = form.Sections[i].LineItems[j].FieldId;
-                form[thisSecId][thisFieldId] = {
-                    index : form.Sections[i].LineItems[j].FieldIndex,
-                    _value : form.Sections[i].LineItems[j].Value
-                }
-            }
-        }
-        //delete stpForm.Sections;
-        
+        form = transformStorageFormatToPublicFormat(form);
     }
     console.log("+++++++++++ all done here ++++++++++++++++");
     res.status(res.locals.status).send(form);

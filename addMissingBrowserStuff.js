@@ -6,6 +6,6 @@ function addMissingBrowserStuff() {
         console.group = (msg) => { console.log(msg); };
     if (!console.groupEnd)
         console.groupEnd = () => { console.log("----end group---"); };
-    window.require = function (anything) { return require("./forms/oTH_PAYROLL_EVENT_CHILDForm"); };
+    // window.require = function (anything) { return require("./forms/oTH_PAYROLL_EVENT_CHILDForm"); };
 }
 exports.addMissingBrowserStuff = addMissingBrowserStuff;
